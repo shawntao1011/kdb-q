@@ -16,8 +16,8 @@ var tipuesearch = {"pages": [{
   },{
     "title": "How to Add Blogs",
     "text": "CONFIG It is very important to set the _config.yml file. Base URL The url part template is: url: 'https://[username].github.io' baseurl: '/[your project name]' FYI, empty baseurl is okay if you only use the gitbook locally. Otherwise the github pages will look different from your local one. Check this blog for more info. Other Settings Check the chinese version config document. pages The simplest method to create page is to add certain html(md) file under the root directory. The path of the file determines the associated URL. . ├── about.md # =&gt; http://example.com/about.html ├── index.html # =&gt; http://example.com/ └── contact.html # =&gt; http://example.com/contact.html Complicated structure like subfolder is also supported. . ├── about.md # =&gt; http://example.com/about.html ├── documentation # folder containing pages │ └── doc1.md # =&gt; http://example.com/documentation/doc1.html ├── design # folder containing pages │ └── draft.md # =&gt; http://example.com/design/draft.html Check official document for more. Posts “The _posts folder is where your blog posts live. You typically write posts in Markdown, HTML is also supported.” To create a post, file need to follow the following format: YEAR-MONTH-DAY-title.MARKUP Where YEAR is a four-digit number, MONTH and DAY are both two-digit numbers, and MARKUP is the file extension representing the format used in the file. For example, the following are examples of valid post filenames: 2011-12-31-new-years-eve-is-awesome.md 2012-09-12-how-to-write-a-blog.md Check official document for more.",
-    "tags": "",
-    "url": "/kdb-q/2021-11-29-howto.html"
+    "tags": "instruction",
+    "url": "/kdb-q/instruction/2021-11-29-howto.html"
   },{
     "title": "",
     "text": "404 Page not found :( The requested page could not be found.",
