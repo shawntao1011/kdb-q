@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head><meta charset="UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"><title>GroupBy · Q notes</title><meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="description" content="My gitbook for docing q, kdb.
+"><meta name="generator" content="Jekyll (using style of GitBook 3.2.9)"><meta name="author" content="Tao Sun"><link rel="stylesheet" href="/kdb-q/gitbook/style.css">
+<link rel="stylesheet" href="/kdb-q/gitbook/gitbook-plugin-fontsettings/website.css">
+<!-- <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css"> -->
+
+<link rel="stylesheet" href="/kdb-q/gitbook/rouge-highlight-colorful.css">
+
+<meta name="HandheldFriendly" content="true"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="/kdb-q/gitbook/images/apple-touch-icon-precomposed-152.png">
+<link rel="shortcut icon" href="/kdb-q/gitbook/images/favicon.ico" type="image/x-icon">
+
+
+            <link rel="prev" href="/kdb-q/algorithm/2021-11-29-RollingWindow.html" />
+        
+
+        
+            <link rel="next" href="/kdb-q/bigtable/2021-11-29-MapReduce.html" />
+        
+    </head>
+    <body>
+        <div class="book"><div class="book-summary">
+    <!-- <div id="book-search-input" role="search">
+        <input type="text" placeholder="Type to search" />
+    </div> -->
+    <nav role="navigation">
+        <ul class="summary">
+            
+            <li class="chapter" data-level="1.1" data-path="/kdb-q">
+            
+                <a href="/kdb-q/">
+                    Q notes
+                </a>
+            </li>
+
+            <li class="divider"></li>
+
+            <!-- search link -->
+            <li>
+                <a href="/kdb-q/search">
+                    Search
+                </a>
+            </li>
+
+            <li class="divider"></li>
+            
+            
+                
+                
+                    
+                    <li class="chapter" data-level="1.1" data-path="/kdb-q/algorithm/2021-11-29-RollingWindow.html">
+                    
+                        <a href="/kdb-q/algorithm/2021-11-29-RollingWindow.html">
+                            Rolling Window
+                        </a>
+                        
+                            
+                        
+                    </li>
+                
+                    
+                    <li class="chapter active" data-level="1.2" data-path="/kdb-q/algorithm/2021-11-29-GroupBy.html">
+                    
+                        <a href="/kdb-q/algorithm/2021-11-29-GroupBy.html">
+                            GroupBy
+                        </a>
+                        
+                            
+                                <ul><li><a href="#pandas-method">pandas method</a></li><li><a href="#q-method">q method</a><ul><li><a href="#aggregate">Aggregate</a></li></ul></li><li><a href="#example">Example</a></li></ul>
+
+                            
+                        
+                    </li>
+                
+
+                <li class="divider"></li>
+                
+            
+                
+                
+                    
+                    <li class="chapter" data-level="1.1" data-path="/kdb-q/bigtable/2021-11-29-MapReduce.html">
+                    
+                        <a href="/kdb-q/bigtable/2021-11-29-MapReduce.html">
+                            MapReduce
+                        </a>
+                        
+                            
+                        
+                    </li>
+                
+
+                <li class="divider"></li>
+                
+            
+        </ul>
+    </nav>
+</div><div class="book-body"><div class="body-inner">
+    <div class="book-header" role="navigation">
+        <!-- Title -->
+        <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+            
+                <a href="." >GroupBy</a>
+            
+        </h1>
+    </div>
+    <div class="page-wrapper" tabindex="-1" role="main">
+        <div class="page-inner">
+            <div id="book-search-results">
+                <div class="search-noresults">
+                    <section class="normal markdown-section">
+
+                        
+                            <h1 id="/algorithm/GroupBy">GroupBy</h1>
+                        
+
+                        <p>The groupby is built-in for q.</p>
+
+<h2 id="pandas-method">pandas method</h2>
+<p>The self-define function apply on pandas groupby object is operating on a small dataframe rather than specified column.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s">'Animal'</span><span class="p">:[</span><span class="s">'Falcon'</span><span class="p">,</span><span class="s">'Falcon'</span><span class="p">,</span><span class="s">'Parrot'</span><span class="p">,</span><span class="s">'Parrot'</span><span class="p">],</span>
+    <span class="s">'Max Speed'</span><span class="p">:[</span><span class="mi">300</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="mi">400</span><span class="p">,</span><span class="mi">500</span><span class="p">],</span>
+    <span class="s">'Min Speed'</span><span class="p">:[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="mi">300</span><span class="p">]</span>
+<span class="p">})</span>
+</code></pre></div></div>
+<p>After groupby(), a groupby object is generated.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>list(df.groupby('Animal'))
+
+[('Falcon',    
+    Animal  Max Speed  Min Speed
+    0  Falcon        300        100
+    1  Falcon        200        100), 
+('Parrot',    
+    Animal  Max Speed  Min Speed
+    2  Parrot        400        200
+    3  Parrot        500        300)]
+</code></pre></div></div>
+
+<p>Suppose we need to get the sum of two column groupby sym,(in this case, get mean,sum or delta of max_speed and min_speed by animal)</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'Animal'</span><span class="p">).</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">({</span>
+                <span class="s">"max_min mean"</span><span class="p">:(</span><span class="n">x</span><span class="p">[</span><span class="s">'Max Speed'</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="s">'Min Speed'</span><span class="p">]).</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">}))</span>
+</code></pre></div></div>
+<p>So the lambda input is the sub dataframe.</p>
+
+<h2 id="q-method">q method</h2>
+<div class="language-q highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">t</span><span class="o">:</span><span class="p">([]</span><span class="w"> </span><span class="n">sym</span><span class="o">:</span><span class="mi">4</span><span class="o">#</span><span class="ss">`a`b</span><span class="p">;</span><span class="n">val1</span><span class="o">:</span><span class="mi">4</span><span class="o">#</span><span class="mi">1</span><span class="o">+</span><span class="nb">til</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="n">val2</span><span class="o">:</span><span class="mi">4</span><span class="o">#</span><span class="mi">2</span><span class="o">+</span><span class="nb">til</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+</code></pre></div></div>
+<p>The q method groupby is called directly and applied on column.</p>
+
+<p>For example,</p>
+<div class="language-q highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">update</span><span class="w"> </span><span class="n">val3</span><span class="o">:</span><span class="n">val1</span><span class="o">*</span><span class="mi">2</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">sym</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">t</span>
+
+<span class="n">sym</span><span class="w"> </span><span class="n">val1</span><span class="w"> </span><span class="n">val2</span><span class="w"> </span><span class="n">val3</span>
+<span class="o">------------------</span>
+<span class="n">a</span><span class="w">   </span><span class="mi">1</span><span class="w">    </span><span class="mi">2</span><span class="w">    </span><span class="mi">2</span>
+<span class="n">b</span><span class="w">   </span><span class="mi">2</span><span class="w">    </span><span class="mi">3</span><span class="w">    </span><span class="mi">4</span>
+<span class="n">a</span><span class="w">   </span><span class="mi">3</span><span class="w">    </span><span class="mi">4</span><span class="w">    </span><span class="mi">6</span>
+<span class="n">b</span><span class="w">   </span><span class="mi">4</span><span class="w">    </span><span class="mi">5</span><span class="w">    </span><span class="mi">8</span>
+</code></pre></div></div>
+<h3 id="aggregate">Aggregate</h3>
+<p>!!<em>Attention</em> check the row number</p>
+<div class="language-q highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">update</span><span class="w"> </span><span class="n">val3</span><span class="o">:</span><span class="n">avg</span><span class="w"> </span><span class="n">val1</span><span class="o">+</span><span class="n">val2</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">sym</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">t</span>
+
+<span class="n">sym</span><span class="w"> </span><span class="n">val1</span><span class="w"> </span><span class="n">val2</span><span class="w"> </span><span class="n">val3</span>
+<span class="o">------------------</span>
+<span class="n">a</span><span class="w">   </span><span class="mi">1</span><span class="w">    </span><span class="mi">2</span><span class="w">    </span><span class="mi">5</span>
+<span class="n">b</span><span class="w">   </span><span class="mi">2</span><span class="w">    </span><span class="mi">3</span><span class="w">    </span><span class="mi">7</span>
+<span class="n">a</span><span class="w">   </span><span class="mi">3</span><span class="w">    </span><span class="mi">4</span><span class="w">    </span><span class="mi">5</span>
+<span class="n">b</span><span class="w">   </span><span class="mi">4</span><span class="w">    </span><span class="mi">5</span><span class="w">    </span><span class="mi">7</span>
+</code></pre></div></div>
+<p>VS</p>
+
+<div class="language-q highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">0</span><span class="o">!</span><span class="k">select</span><span class="w"> </span><span class="n">val3</span><span class="o">:</span><span class="n">avg</span><span class="w"> </span><span class="n">val1</span><span class="o">+</span><span class="n">val2</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">sym</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">t</span>
+
+<span class="n">sym</span><span class="w"> </span><span class="n">val3</span>
+<span class="o">--------</span>
+<span class="n">a</span><span class="w">   </span><span class="mi">5</span>
+<span class="n">b</span><span class="w">   </span><span class="mi">7</span>
+</code></pre></div></div>
+<p>The row number <em>differs</em> a lot. The result of <font color="blue">select</font> query is much more like the pandas groupby, where the key number will be the same as the group <em>set</em> of grouped pairs.</p>
+
+<p>THUS, as long as the column you groupby with is <font color="red">with duplicates</font>, use select rather than update.</p>
+
+<h2 id="example">Example</h2>
+
+                    </section>
+                </div>
+
+                 <!--<div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+                    <a href="/kdb-q/algorithm/2021-11-29-RollingWindow.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Rolling Window">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="/kdb-q/bigtable/2021-11-29-MapReduce.html" class="navigation navigation-next navigation-unique" aria-label="Next page: MapReduce">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </div>
+
+            <script>
+            var gitbook = gitbook || [];
+            gitbook.push(function() {
+                gitbook.page.hasChanged({
+    "page": {
+        "title": "Introduction",
+        "level": "1.1",
+        "depth": 1,
+        
+        "next": {
+            "title": "MapReduce",
+            "level": "1.2",
+            "depth": 1,
+            "path": "_posts/big_table/2021-11-29-MapReduce.md",
+            "ref": "_posts/big_table/2021-11-29-MapReduce.md",
+            "articles": []
+        },
+        
+        "dir": "ltr"
+    },    "config": {
+        "plugins": ["fontsettings", "highlight", "livereload", "lunr", "search", "sharing", "theme-default", "livereload"],
+        "styles": {
+            "ebook": "styles/ebook.css",
+            "epub": "styles/epub.css",
+            "mobi": "styles/mobi.css",
+            "pdf": "styles/pdf.css",
+            "print": "styles/print.css",
+            "website": "styles/website.css"
+        },
+        "pluginsConfig": {
+            "fontsettings": {
+                "family": "sans",
+                "size": 2,
+                "theme": "white"
+            },
+            "highlight": {},
+            "livereload": {},
+            "lunr": {
+                "ignoreSpecialCharacters": false,
+                "maxIndexSize": 1000000
+            },
+            "search": {},
+            "sharing": {
+                "all": ["facebook", "google", "twitter", "weibo", "instapaper"],
+                "facebook": true,
+                "google": false,
+                "instapaper": false,
+                "twitter": true,
+                "vk": false,
+                "weibo": false
+            },
+            "theme-default": {
+                "showLevel": false,
+                "styles": {
+                    "ebook": "styles/ebook.css",
+                    "epub": "styles/epub.css",
+                    "mobi": "styles/mobi.css",
+                    "pdf": "styles/pdf.css",
+                    "print": "styles/print.css",
+                    "website": "styles/website.css"
+                }
+            }
+        },
+        "theme": "default",
+        "author": "Tao He",
+        "pdf": {
+            "pageNumbers": true,
+            "fontSize": 12,
+            "fontFamily": "Arial",
+            "paperSize": "a4",
+            "chapterMark": "pagebreak",
+            "pageBreaksBefore": "/",
+            "margin": {
+                "right": 62,
+                "left": 62,
+                "top": 56,
+                "bottom": 56
+            }
+        },
+        "structure": {
+            "langs": "LANGS.md",
+            "readme": "README.md",
+        },
+        "variables": {},
+        "title": "Q notes",
+        "language": "en",
+        "gitbook": "*"
+    },
+    "file": {
+        "path": "_posts/algorithm/2021-11-29-GroupBy.md",
+        "mtime": "2021-11-29 19:02:00 +0800",
+        "type": "markdown"
+    },
+    "gitbook": {
+        "version": "3.2.9",
+        "time": "2021-11-30 13:31:20 +0800"
+    },
+    "basePath": "/kdb-q",
+    "book": {
+        "language": ""
+    }
+});
+            });
+            </script>
+        </div><script src="/kdb-q/gitbook/gitbook.js"></script>
+<script src="/kdb-q/gitbook/theme.js"></script>
+
+<script src="/kdb-q/gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+<script src="/kdb-q/gitbook/gitbook-plugin-sharing/buttons.js"></script>
+
+<!-- <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+<script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+<script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+<script src="../gitbook/gitbook-plugin-search/search.js"></script> -->
+
+</body>
+</html>

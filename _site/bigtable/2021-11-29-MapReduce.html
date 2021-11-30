@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<html lang="en" >
+    <head><meta charset="UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"><title>MapReduce · Q notes</title><meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="description" content="My gitbook for docing q, kdb.
+"><meta name="generator" content="Jekyll (using style of GitBook 3.2.9)"><meta name="author" content="Tao Sun"><link rel="stylesheet" href="/kdb-q/gitbook/style.css">
+<link rel="stylesheet" href="/kdb-q/gitbook/gitbook-plugin-fontsettings/website.css">
+<!-- <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css"> -->
+
+<link rel="stylesheet" href="/kdb-q/gitbook/rouge-highlight-colorful.css">
+
+<meta name="HandheldFriendly" content="true"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="/kdb-q/gitbook/images/apple-touch-icon-precomposed-152.png">
+<link rel="shortcut icon" href="/kdb-q/gitbook/images/favicon.ico" type="image/x-icon">
+
+
+            <link rel="prev" href="/kdb-q/algorithm/2021-11-29-GroupBy.html" />
+        
+
+        
+    </head>
+    <body>
+        <div class="book"><div class="book-summary">
+    <!-- <div id="book-search-input" role="search">
+        <input type="text" placeholder="Type to search" />
+    </div> -->
+    <nav role="navigation">
+        <ul class="summary">
+            
+            <li class="chapter" data-level="1.1" data-path="/kdb-q">
+            
+                <a href="/kdb-q/">
+                    Q notes
+                </a>
+            </li>
+
+            <li class="divider"></li>
+
+            <!-- search link -->
+            <li>
+                <a href="/kdb-q/search">
+                    Search
+                </a>
+            </li>
+
+            <li class="divider"></li>
+            
+            
+                
+                
+                    
+                    <li class="chapter" data-level="1.1" data-path="/kdb-q/algorithm/2021-11-29-RollingWindow.html">
+                    
+                        <a href="/kdb-q/algorithm/2021-11-29-RollingWindow.html">
+                            Rolling Window
+                        </a>
+                        
+                            
+                        
+                    </li>
+                
+                    
+                    <li class="chapter" data-level="1.1" data-path="/kdb-q/algorithm/2021-11-29-GroupBy.html">
+                    
+                        <a href="/kdb-q/algorithm/2021-11-29-GroupBy.html">
+                            GroupBy
+                        </a>
+                        
+                            
+                        
+                    </li>
+                
+
+                <li class="divider"></li>
+                
+            
+                
+                
+                    
+                    <li class="chapter active" data-level="1.2" data-path="/kdb-q/bigtable/2021-11-29-MapReduce.html">
+                    
+                        <a href="/kdb-q/bigtable/2021-11-29-MapReduce.html">
+                            MapReduce
+                        </a>
+                        
+                            
+                                <ul><li><a href="#split-by-syms">Split by Syms</a></li><li><a href="#split-by-strategy">Split by Strategy</a></li><li><a href="#example">Example</a></li></ul>
+
+                            
+                        
+                    </li>
+                
+
+                <li class="divider"></li>
+                
+            
+        </ul>
+    </nav>
+</div><div class="book-body"><div class="body-inner">
+    <div class="book-header" role="navigation">
+        <!-- Title -->
+        <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+            
+                <a href="." >MapReduce</a>
+            
+        </h1>
+    </div>
+    <div class="page-wrapper" tabindex="-1" role="main">
+        <div class="page-inner">
+            <div id="book-search-results">
+                <div class="search-noresults">
+                    <section class="normal markdown-section">
+
+                        
+                            <h1 id="/bigtable/MapReduce">MapReduce</h1>
+                        
+
+                        <p>Sometimes the tdb database is way too big to read all the columns into memory. So map reduce is necessary to split big table into small blocks.</p>
+
+<p><img src="https://th.bing.com/th/id/OIP.6HY3K-GyD79l-SZFGNIyZwHaDc?w=330&amp;h=162&amp;c=7&amp;r=0&amp;o=5&amp;dpr=1.25&amp;pid=1.7" alt="Image result for map reduce" /></p>
+
+<h2 id="split-by-syms">Split by Syms</h2>
+
+<p>Since date is required to query table in tdb, so date is fixed. For tick-level data and 32bit KDB, no more than 2 columns should be used as the columns will be mapped into memory .</p>
+
+<p>Normally, filter table by sym is a good choice.</p>
+
+<div class="language-q highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">batch_groups</span><span class="o">:</span><span class="p">{[</span><span class="n">topic</span><span class="p">;</span><span class="n">par</span><span class="p">;</span><span class="n">syms</span><span class="p">]</span>
+<span class="w">	</span><span class="kc">0N</span><span class="o">!</span><span class="n">par</span><span class="p">;</span>
+<span class="w">	</span><span class="n">date_sym</span><span class="o">:</span><span class="mi">0</span><span class="o">!</span><span class="k">select</span><span class="w"> </span><span class="n">rid</span><span class="o">:</span><span class="n">i</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">sym</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">topic</span><span class="w"> </span><span class="ow">where</span><span class="w"> </span><span class="n">date</span><span class="o">=</span><span class="n">par</span><span class="o">,</span><span class="w"> </span><span class="n">sym</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">syms</span><span class="p">;</span><span class="w">	</span>
+<span class="w">	</span><span class="o">...</span>
+<span class="p">}</span>
+
+<span class="n">date_sym</span>
+<span class="n">sym</span><span class="w">      </span><span class="o">|</span><span class="w"> </span><span class="n">rid</span><span class="w">                                                               </span><span class="o">..</span>
+<span class="o">---------|</span><span class="w"> </span><span class="o">------------------------------------------------------------------..</span>
+<span class="mf">000001.</span><span class="n">SZ</span><span class="o">|</span><span class="w"> </span><span class="mi">38309230</span><span class="w"> </span><span class="mi">38309231</span><span class="w"> </span><span class="mi">38309232</span><span class="w"> </span><span class="mi">38309233</span><span class="w"> </span><span class="mi">38309234</span><span class="w"> </span><span class="mi">38309235</span><span class="w"> </span><span class="mi">38309236</span><span class="w"> </span><span class="mf">383.</span><span class="o">.</span>
+<span class="mf">000002.</span><span class="n">SZ</span><span class="o">|</span><span class="w"> </span><span class="mi">38414128</span><span class="w"> </span><span class="mi">38414129</span><span class="w"> </span><span class="mi">38414130</span><span class="w"> </span><span class="mi">38414131</span><span class="w"> </span><span class="mi">38414132</span><span class="w"> </span><span class="mi">38414133</span><span class="w"> </span><span class="mi">38414134</span><span class="w"> </span><span class="mf">384.</span><span class="o">.</span>
+</code></pre></div></div>
+
+<h2 id="split-by-strategy">Split by Strategy</h2>
+
+<h2 id="example">Example</h2>
+
+                    </section>
+                </div>
+
+                 <!--<div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+                    <a href="/kdb-q/algorithm/2021-11-29-GroupBy.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: GroupBy">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+            </div>
+
+            <script>
+            var gitbook = gitbook || [];
+            gitbook.push(function() {
+                gitbook.page.hasChanged({
+    "page": {
+        "title": "Introduction",
+        "level": "1.1",
+        "depth": 1,
+        
+        "dir": "ltr"
+    },    "config": {
+        "plugins": ["fontsettings", "highlight", "livereload", "lunr", "search", "sharing", "theme-default", "livereload"],
+        "styles": {
+            "ebook": "styles/ebook.css",
+            "epub": "styles/epub.css",
+            "mobi": "styles/mobi.css",
+            "pdf": "styles/pdf.css",
+            "print": "styles/print.css",
+            "website": "styles/website.css"
+        },
+        "pluginsConfig": {
+            "fontsettings": {
+                "family": "sans",
+                "size": 2,
+                "theme": "white"
+            },
+            "highlight": {},
+            "livereload": {},
+            "lunr": {
+                "ignoreSpecialCharacters": false,
+                "maxIndexSize": 1000000
+            },
+            "search": {},
+            "sharing": {
+                "all": ["facebook", "google", "twitter", "weibo", "instapaper"],
+                "facebook": true,
+                "google": false,
+                "instapaper": false,
+                "twitter": true,
+                "vk": false,
+                "weibo": false
+            },
+            "theme-default": {
+                "showLevel": false,
+                "styles": {
+                    "ebook": "styles/ebook.css",
+                    "epub": "styles/epub.css",
+                    "mobi": "styles/mobi.css",
+                    "pdf": "styles/pdf.css",
+                    "print": "styles/print.css",
+                    "website": "styles/website.css"
+                }
+            }
+        },
+        "theme": "default",
+        "author": "Tao He",
+        "pdf": {
+            "pageNumbers": true,
+            "fontSize": 12,
+            "fontFamily": "Arial",
+            "paperSize": "a4",
+            "chapterMark": "pagebreak",
+            "pageBreaksBefore": "/",
+            "margin": {
+                "right": 62,
+                "left": 62,
+                "top": 56,
+                "bottom": 56
+            }
+        },
+        "structure": {
+            "langs": "LANGS.md",
+            "readme": "README.md",
+        },
+        "variables": {},
+        "title": "Q notes",
+        "language": "en",
+        "gitbook": "*"
+    },
+    "file": {
+        "path": "_posts/big_table/2021-11-29-MapReduce.md",
+        "mtime": "2021-11-29 19:08:00 +0800",
+        "type": "markdown"
+    },
+    "gitbook": {
+        "version": "3.2.9",
+        "time": "2021-11-30 13:31:20 +0800"
+    },
+    "basePath": "/kdb-q",
+    "book": {
+        "language": ""
+    }
+});
+            });
+            </script>
+        </div><script src="/kdb-q/gitbook/gitbook.js"></script>
+<script src="/kdb-q/gitbook/theme.js"></script>
+
+<script src="/kdb-q/gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+<script src="/kdb-q/gitbook/gitbook-plugin-sharing/buttons.js"></script>
+
+<!-- <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+<script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+<script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+<script src="../gitbook/gitbook-plugin-search/search.js"></script> -->
+
+</body>
+</html>
