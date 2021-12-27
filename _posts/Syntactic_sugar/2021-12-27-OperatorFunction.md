@@ -38,6 +38,7 @@ Sample operation on complex table
 
         deltas, count
 
+
 ```q
 //deltas of each row
 update deltaA:deltas each a, countB:count b by g from t2
@@ -75,12 +76,14 @@ update c:a-b by g from t2
 
 #### Rolling Operation on one simple column:
         eg: rolling sum, size 5
+        
 ```q
 update sumA:rw[sum;5;a] by g from t1
 ```
 
 #### Rolling Operation on several simple column:
         eg: rolling sum of a and b, size 5
+
 ```q
 //the res is a column of 5 atom list, which takes the result of nearest 5 a+b
 update sumAB:rw[(+) . value flip @;5;([] a;b)] by g from t1
