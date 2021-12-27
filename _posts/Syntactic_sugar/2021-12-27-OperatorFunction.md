@@ -76,7 +76,7 @@ update c:a-b by g from t2
 
 #### Rolling Operation on one simple column:
         eg: rolling sum, size 5
-        
+
 ```q
 update sumA:rw[sum;5;a] by g from t1
 ```
@@ -84,6 +84,7 @@ update sumA:rw[sum;5;a] by g from t1
 #### Rolling Operation on several simple column:
         eg: rolling sum of a and b, size 5
 
+Take table t1 for example:
 ```q
 //the res is a column of 5 atom list, which takes the result of nearest 5 a+b
 update sumAB:rw[(+) . value flip @;5;([] a;b)] by g from t1
@@ -100,6 +101,8 @@ update sumAB:sum each rw[(+) . value flip @;5;([] a;b)] by g from t1
 <font color=red>!rolling window function needs to rewrite</font> 
 
 as 0#x will generate a empty list which can not do some operation a several atom list
+
+take table t2 for example
 ```
 // form a list by appending 5 latest 3 atom list
 update c: rw[(,);5;a] by g from t2
