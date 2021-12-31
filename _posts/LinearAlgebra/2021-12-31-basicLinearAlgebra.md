@@ -5,12 +5,23 @@ date: 2021-12-31 14:54:00 +0800
 category: Linear Algebra
 layout: post
 ---
-# <center>Basic Linear Algebra in q</center>
+
+<head>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$']]
+            }
+        });
+    </script>
+</head>
 
 This note is heavily referenced on [James Neill's blog](http://jpneill.github.io/kdb_blog.html)
 
 ## Matrix
-As an array processing language q allows us to perform vectorised operations on lists. The presence of vectors and matrices in q means that basic linear algebra techniques are available to us. A matrix in q is represented as a list of lists:
+As an array processing language q allows us to perform vectorized operations on lists. The presence of vectors and matrices in q means that basic linear algebra techniques are available to us. A matrix in q is represented as a list of lists:
 ```q
 q)A:(1 2;3 4f)
 q)A
