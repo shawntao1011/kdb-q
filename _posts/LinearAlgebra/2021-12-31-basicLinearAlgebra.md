@@ -78,7 +78,7 @@ q) A - B
 -4 -4
 ```
 
-### Dot Product of 2 vector
+## Dot Product of 2 vector
 
 The dot product two vectors  and take the sum
 
@@ -94,7 +94,7 @@ q)v$w
 11f
 ```
 
-### Dot Product of 2 matrices
+## Dot Product of 2 matrices
 
 ```q
 q)A mmu B
@@ -102,7 +102,7 @@ q)A mmu B
 43 50
 ```
 
-### Matrix Transpose
+## Matrix Transpose
 
 ```q
 q)A
@@ -118,7 +118,7 @@ q) flip A
 2 4
 ```
 
-### Identity Matrix
+## Identity Matrix
 
 The identity matrix is the n x n square matrix with ones along the main diagonal and zeros elsewhere. It is commonly denoted as **I**n. For an m x n matrix **A** the identity matrix has the property:
 $$
@@ -134,7 +134,7 @@ IMatrix 3
 001
 ```
 
-### Diagonal Matrix
+## Diagonal Matrix
 
 A diagonal matrix is a matrix with 0 for all elements that are not on the main diagonal. We can construct one in q using the identity matrix definition above:
 
@@ -146,7 +146,7 @@ DiagMatrix 4 0 1.3
 0 0 1.3
 ```
 
-### Matrix Inversion
+## Matrix Inversion
 
 An n x n square matrix **A** is invertible if there exists an n x n matrix **A^-1** such that the following is true:
 $$
