@@ -37,7 +37,7 @@ conf:(!). flip (
     (`v2;`f2)
  )
 
-![;();0b;(`c1`c2)!((key conf);value conf);] rawTable
+![;();0b;(`c1`c2)!((key conf);value conf)] rawTable
 ```
 **table**
 ```q
